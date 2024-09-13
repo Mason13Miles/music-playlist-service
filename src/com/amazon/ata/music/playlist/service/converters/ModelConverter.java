@@ -9,9 +9,13 @@ public class ModelConverter {
      * @param playlist the playlist to convert
      * @return the converted playlist
      */
-    public PlaylistModel toPlaylistModel(Playlist playlist) {
+    public static PlaylistModel toPlaylistModel(Playlist playlist) {
         return PlaylistModel.builder()
             .withId(playlist.getId())
+                .withName(playlist.getName())
+                .withCustomerId(playlist.getCustomerId())
+                .withSongCount(playlist.getSongCount())
+                .withTags(playlist.getTags())
             .build();
     }
 }
