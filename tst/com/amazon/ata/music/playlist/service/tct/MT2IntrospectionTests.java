@@ -30,6 +30,7 @@ public class MT2IntrospectionTests {
             .findClassOrFail();
 
         Class<?> valueParentException = valueException.getSuperclass();
+        System.out.println("Superclass for valueParentException is: " + valueParentException);
         Class<?> changeParentException = changeException.getSuperclass();
 
         // WHEN we compare the exceptions parent classes
