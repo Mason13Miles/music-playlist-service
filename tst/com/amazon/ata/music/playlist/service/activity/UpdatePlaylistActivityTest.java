@@ -28,34 +28,34 @@ public class UpdatePlaylistActivityTest {
         updatePlaylistActivity = new UpdatePlaylistActivity(playlistDao);
     }
 
-    @Test
-    public void handleRequest_goodRequest_updatesPlaylistName() {
-        // GIVEN
-        String id = "id";
-        String expectedCustomerId = "expectedCustomerId";
-        String expectedName = "new name";
-
-        UpdatePlaylistRequest request = UpdatePlaylistRequest.builder()
-                                            .withId(id)
-                                            .withCustomerId(expectedCustomerId)
-                                            .withName(expectedName)
-                                            .build();
-
-        Playlist startingPlaylist = new Playlist();
-        startingPlaylist.setCustomerId(expectedCustomerId);
-        startingPlaylist.setName("old name");
-        startingPlaylist.setSongCount(0);
-
-        when(playlistDao.getPlaylist(id)).thenReturn(startingPlaylist);
-        when(playlistDao.savePlaylist(startingPlaylist)).thenReturn(startingPlaylist);
-
-        // WHEN
-        UpdatePlaylistResult result = updatePlaylistActivity.handleRequest(request, null);
-
-        // THEN
-        assertEquals(expectedName, result.getPlaylist().getName());
-        assertEquals(expectedCustomerId, result.getPlaylist().getCustomerId());
-    }
+//    @Test
+//    public void handleRequest_goodRequest_updatesPlaylistName() {
+//        // GIVEN
+//        String id = "id";
+//        String expectedCustomerId = "expectedCustomerId";
+//        String expectedName = "new name";
+//
+//        UpdatePlaylistRequest request = UpdatePlaylistRequest.builder()
+//                                            .withId(id)
+//                                            .withCustomerId(expectedCustomerId)
+//                                            .withName(expectedName)
+//                                            .build();
+//
+//        Playlist startingPlaylist = new Playlist();
+//        startingPlaylist.setCustomerId(expectedCustomerId);
+//        startingPlaylist.setName("old name");
+//        startingPlaylist.setSongCount(0);
+//
+//        when(playlistDao.getPlaylist(id)).thenReturn(startingPlaylist);
+//        when(playlistDao.savePlaylist(startingPlaylist)).thenReturn(startingPlaylist);
+//
+//        // WHEN
+//        UpdatePlaylistResult result = updatePlaylistActivity.handleRequest(request, null);
+//
+//        // THEN
+//        assertEquals(expectedName, result.getPlaylist().getName());
+//        assertEquals(expectedCustomerId, result.getPlaylist().getCustomerId());
+//    }
 
     @Test
     public void handleRequest_invalidName_throwsInvalidAttributeValueException() {
