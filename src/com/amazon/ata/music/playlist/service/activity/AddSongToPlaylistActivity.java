@@ -1,5 +1,6 @@
 package com.amazon.ata.music.playlist.service.activity;
 
+import com.amazon.ata.music.playlist.service.converters.ModelConverter;
 import com.amazon.ata.music.playlist.service.dynamodb.models.AlbumTrack;
 import com.amazon.ata.music.playlist.service.dynamodb.models.Playlist;
 import com.amazon.ata.music.playlist.service.exceptions.AlbumTrackNotFoundException;
@@ -17,6 +18,7 @@ import org.apache.logging.log4j.Logger;
 
 import javax.inject.Inject;
 import java.util.Collections;
+import java.util.LinkedList;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -77,27 +79,37 @@ public class AddSongToPlaylistActivity implements RequestHandler<AddSongToPlayli
             throw new AlbumTrackNotFoundException("Album track not found with ASIN: " + asin + " and track number: " + trackNumber);
         }
 
-        // Add the album track to the playlist's song list
-        playlist.getSongList().add(albumTrack);
-        playlist.setSongCount(playlist.getSongList().size());
+        // Get the song list and add the album track
+        List<AlbumTrack> songList = playlist.getSongList();
+        if (songList instanceof LinkedList) {
+            LinkedList<AlbumTrack> linkedList = (LinkedList<AlbumTrack>) songList;
+            if (Boolean.TRUE.equals(addSongToPlaylistRequest.isQueueNext())) {
+                // Add the song to the front of the playlist in O(1) time
+                linkedList.addFirst(albumTrack);
+            } else {
+                // Add the song to the end of the playlist
+                linkedList.add(albumTrack);
+            }
+        } else {
+            throw new IllegalStateException("Playlist songList is not of type LinkedList");
+        }
+
+        // Update song count
+        playlist.setSongCount(songList.size());
 
         // Save the updated playlist
         playlistDao.savePlaylist(playlist);
 
         // Convert the album tracks in the playlist to SongModel using the builder pattern
-        List<SongModel> songModels = playlist.getSongList().stream()
-                .map(track -> SongModel.builder()
-                        .withAsin(track.getAsin())
-                        .withAlbum(track.getAlbumName())
-                        .withTrackNumber(track.getTrackNumber())
-                        .withTitle(track.getSongTitle())
-                        .build())
+        List<SongModel> songModels = songList.stream()
+                .map(ModelConverter::toSongModel)
                 .collect(Collectors.toList());
 
-        // Return the updated song list
+        // Return the result with the list of SongModel objects
         return AddSongToPlaylistResult.builder()
                 .withSongList(songModels)
                 .build();
     }
+
 
 }
