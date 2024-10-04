@@ -84,28 +84,24 @@ public class AddSongToPlaylistActivity implements RequestHandler<AddSongToPlayli
         if (songList instanceof LinkedList) {
             LinkedList<AlbumTrack> linkedList = (LinkedList<AlbumTrack>) songList;
             if (Boolean.TRUE.equals(addSongToPlaylistRequest.isQueueNext())) {
-                // Add the song to the front of the playlist in O(1) time
+
                 linkedList.addFirst(albumTrack);
             } else {
-                // Add the song to the end of the playlist
+
                 linkedList.add(albumTrack);
             }
         } else {
             throw new IllegalStateException("Playlist songList is not of type LinkedList");
         }
 
-        // Update song count
         playlist.setSongCount(songList.size());
 
-        // Save the updated playlist
         playlistDao.savePlaylist(playlist);
 
-        // Convert the album tracks in the playlist to SongModel using the builder pattern
         List<SongModel> songModels = songList.stream()
                 .map(ModelConverter::toSongModel)
                 .collect(Collectors.toList());
 
-        // Return the result with the list of SongModel objects
         return AddSongToPlaylistResult.builder()
                 .withSongList(songModels)
                 .build();

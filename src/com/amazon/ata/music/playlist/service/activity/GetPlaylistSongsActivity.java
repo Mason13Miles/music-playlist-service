@@ -50,35 +50,41 @@ public class GetPlaylistSongsActivity implements RequestHandler<GetPlaylistSongs
      */
     @Override
     public GetPlaylistSongsResult handleRequest(final GetPlaylistSongsRequest getPlaylistSongsRequest, Context context) {
-        // Log the received request
+
         log.info("Received GetPlaylistSongsRequest {}", getPlaylistSongsRequest);
 
-        // Fetch the playlist from the DAO using the playlist ID
+
         String playlistId = getPlaylistSongsRequest.getId();
         Playlist playlist = playlistDao.getPlaylist(playlistId);
         if (playlist == null) {
             throw new PlaylistNotFoundException("Playlist not found with ID: " + playlistId);
         }
 
-        // Convert AlbumTrack objects to SongModel using ModelConverter
         List<SongModel> songModels = playlist.getSongList().stream()
                 .map(ModelConverter::toSongModel)
                 .collect(Collectors.toList());
 
-        // Modify the list based on the order parameter
-        String order = String.valueOf(getPlaylistSongsRequest.getOrder());
-        if (SongOrder.REVERSED.equals(order)) {
-            Collections.reverse(songModels);
-        } else if (SongOrder.SHUFFLED.equals(order)) {
-            Collections.shuffle(songModels);
-        } else {
-            throw new IllegalArgumentException("invalid Song Order");
+        SongOrder order = getPlaylistSongsRequest.getOrder();
+        if (order != null) {
+            switch (order) {
+                case REVERSED:
+                    Collections.reverse(songModels);
+                    break;
+                case SHUFFLED:
+                    Collections.shuffle(songModels);
+                    break;
+                case DEFAULT:
+
+                    break;
+                default:
+                    throw new IllegalArgumentException("Invalid song order: " + order);
+            }
         }
 
-        // Return the result with the list of SongModel objects
         return GetPlaylistSongsResult.builder()
                 .withSongList(songModels)
                 .build();
     }
+
 
 }

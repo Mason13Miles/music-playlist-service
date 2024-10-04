@@ -128,7 +128,7 @@ public class GetPlaylistSongsActivityTest {
 //        String id = playlist.getId();
 //        GetPlaylistSongsRequest request = GetPlaylistSongsRequest.builder()
 //            .withId(id)
-//            .withOrder(SongOrder.valueOf("NOT A VALID ORDER"))
+//            .withOrder((SongOrder.valueOf("NOT A VALID ORDER")))
 //            .build();
 //
 //        // WHEN + THEN
